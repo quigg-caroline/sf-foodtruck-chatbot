@@ -6,3 +6,5 @@
 /.vs
 /FoodTruckBot/FoodTruckBot/obj
 /FoodTruckBot/FoodTruckBot/bin/Debug/netcoreapp3.1
+/FoodTruckBot/FoodTruckBotTests/bin/Debug/netcoreapp3.1
+/FoodTruckBot/FoodTruckBotTests/obj
