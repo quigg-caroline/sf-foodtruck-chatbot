@@ -52,5 +52,16 @@ namespace FoodTruckBotTests
             Assert.AreEqual("Test Value", result.Buttons.First().Title);
             Assert.AreEqual("https://www.google.com/maps/dir/?api=1&origin=37.851%2C-122.04&destination=37.861%2C-122.05", result.Buttons.First().Value);
         }
+
+        [TestMethod]
+        public void GetHeroCard_PopulatesWithApplicantWhenNoFoodItems()
+        {
+            var sampleFoodTruck = new FoodTruck { Address = "SampleAddress", Latitude = 37.861, Longitude = -122.05, FoodItems = "", Applicant= "Food Truck Applicant" };
+
+            var result = FoodTruckDataHelper.GetHeroCard(new List<FoodTruck> { sampleFoodTruck }, "37.851", "-122.04");
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Food Truck Applicant", result.Buttons.First().Title);
+            Assert.AreEqual("https://www.google.com/maps/dir/?api=1&origin=37.851%2C-122.04&destination=37.861%2C-122.05", result.Buttons.First().Value);
+        }
     }
 }

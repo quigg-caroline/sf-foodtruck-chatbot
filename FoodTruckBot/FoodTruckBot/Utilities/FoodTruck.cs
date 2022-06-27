@@ -1,5 +1,6 @@
 ﻿using CsvHelper.Configuration.Attributes;
 using Geolocation;
+using System.Linq;
 
 namespace FoodTruckBot.Utilities
 {
@@ -18,5 +19,8 @@ namespace FoodTruckBot.Utilities
 
         [Ignore]
         public Coordinate Coordinate => new Coordinate(this.Latitude, this.Longitude);
+
+        [Ignore]
+        public string TruckFoodName => string.IsNullOrEmpty(this.FoodItems.Split(":").First()) ? this.Applicant : this.FoodItems.Split(":").First();
     }
 }
