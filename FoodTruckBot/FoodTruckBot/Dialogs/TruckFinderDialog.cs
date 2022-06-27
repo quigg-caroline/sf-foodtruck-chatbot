@@ -7,6 +7,7 @@
     using FoodTruckBot.Utilities;
     using Microsoft.Bot.Builder;
     using Microsoft.Bot.Builder.Dialogs;
+    using Microsoft.Bot.Schema;
 
     public class TruckFinderDialog : ComponentDialog
     {
@@ -62,7 +63,7 @@
                 var foodTruckData = FoodTruckDataHelper.LoadFoodTruckData();
                 var results = FoodTruckDataHelper.FindFiveClosetTrucks(foodTruckData, originLatitude, originLongitude);
 
-                var msg = string.Join("\n", results.Select(truck => truck.Address));
+                var msg = MessageFactory.Attachment(FoodTruckDataHelper.GetHeroCard(results, stepContext.Values["latitude"].ToString(), stepContext.Values["longitude"].ToString()).ToAttachment());
 
                 await stepContext.Context.SendActivityAsync(msg, cancellationToken: cancellationToken);
                 return await stepContext.EndDialogAsync(cancellationToken: cancellationToken);

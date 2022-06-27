@@ -1,5 +1,6 @@
 using FoodTruckBot.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace FoodTruckBotTests
@@ -39,6 +40,17 @@ namespace FoodTruckBotTests
             Assert.AreEqual(top.Address, expectedTruck.Address);
             Assert.AreEqual(top.Latitude, expectedTruck.Latitude);
             Assert.AreEqual(top.Longitude, expectedTruck.Longitude);
+        }
+
+        [TestMethod]
+        public void GetHeroCard_PopulatesExpectedData()
+        {
+            var sampleFoodTruck = new FoodTruck { Address = "SampleAddress", Latitude = 37.861, Longitude = -122.05};
+
+            var result = FoodTruckDataHelper.GetHeroCard(new List<FoodTruck> { sampleFoodTruck }, "37.851", "-122.04");
+            Assert.IsNotNull(result);
+            Assert.AreEqual(sampleFoodTruck.Address, result.Buttons.First().Title);
+            Assert.AreEqual("https://www.google.com/maps/dir/?api=1&origin=37.851%2C-122.04&destination=37.861%2C-122.05", result.Buttons.First().Value);
         }
     }
 }

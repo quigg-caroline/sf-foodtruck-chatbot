@@ -7,6 +7,7 @@
     using System.Reflection;
     using CsvHelper;
     using Geolocation;
+    using Microsoft.Bot.Schema;
 
     /// <summary>
     /// Helper class for handling food truck data
@@ -40,6 +41,40 @@
             var nearest = foodTrucks.OrderBy(truck => GeoCalculator.GetDistance(truck.Coordinate, targetCoord, decimalPlaces: 2));
 
             return nearest.Take(5);
+        }
+
+        /// <summary>
+        /// Construct card object based on provided food trucks
+        /// </summary>
+        /// <param name="trucks">Collection of food truck data</param>
+        /// <param name="latitude">Input latitude</param>
+        /// <param name="longitude">Input longitude</param>
+        /// <returns></returns>
+        public static HeroCard GetHeroCard(IEnumerable<FoodTruck> trucks, string latitude, string longitude)
+        {
+            var cardActions = trucks.Select(x => new CardAction(ActionTypes.OpenUrl, x.Address, value: GetGoogleMapsDirectionUri(x, latitude, longitude))).ToList();
+            var heroCard = new HeroCard
+            {
+                Title = "Food Truck Recommendations",
+                Subtitle = "Click to get directions from your location",
+                Buttons = cardActions
+            };
+
+            return heroCard;
+        }
+
+        /// <summary>
+        /// Format url to get directions to truck from target location
+        /// </summary>
+        /// <param name="foodTruck">Food truck data</param>
+        /// <param name="latitude">Origin latitude</param>
+        /// <param name="longitude">Origin longitude</param>
+        /// <returns></returns>
+        private static string GetGoogleMapsDirectionUri(FoodTruck foodTruck, string latitude, string longitude)
+        {
+            var baseUrl = "https://www.google.com/maps/dir/?api=1";
+            var query = $"&origin={latitude}%2C{longitude}&destination={foodTruck.Latitude}%2C{foodTruck.Longitude}";
+            return baseUrl + query;
         }
 
         /// <summary>

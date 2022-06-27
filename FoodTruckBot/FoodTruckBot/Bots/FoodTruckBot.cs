@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 //
 
-using FoodTruckBot.States;
 using FoodTruckBot.Utilities;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
@@ -20,8 +19,6 @@ namespace FoodTruckBot.Bots
         // Messages sent to the user.
         private const string WelcomeMessage = "Hello there! Welcome to FoodTruck Bot."+
                                               "Let me help you find some tasty places to eat near you. ";
-
-        private const string PatternMessage = "Try it now, type 'hi'";
 
         protected readonly Dialog Dialog;
         protected readonly BotState ConversationState;
