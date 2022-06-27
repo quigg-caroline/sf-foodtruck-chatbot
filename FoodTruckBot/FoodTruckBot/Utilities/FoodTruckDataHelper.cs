@@ -52,7 +52,7 @@
         /// <returns></returns>
         public static HeroCard GetHeroCard(IEnumerable<FoodTruck> trucks, string latitude, string longitude)
         {
-            var cardActions = trucks.Select(x => new CardAction(ActionTypes.OpenUrl, x.Address, value: GetGoogleMapsDirectionUri(x, latitude, longitude))).ToList();
+            var cardActions = trucks.Select(x => new CardAction(ActionTypes.OpenUrl, x.FoodItems.Split(":").First(), value: GetGoogleMapsDirectionUri(x, latitude, longitude))).ToList();
             var heroCard = new HeroCard
             {
                 Title = "Food Truck Recommendations",

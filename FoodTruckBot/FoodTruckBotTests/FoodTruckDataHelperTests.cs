@@ -45,11 +45,11 @@ namespace FoodTruckBotTests
         [TestMethod]
         public void GetHeroCard_PopulatesExpectedData()
         {
-            var sampleFoodTruck = new FoodTruck { Address = "SampleAddress", Latitude = 37.861, Longitude = -122.05};
+            var sampleFoodTruck = new FoodTruck { Address = "SampleAddress", Latitude = 37.861, Longitude = -122.05, FoodItems = "Test Value: Test Value2"};
 
             var result = FoodTruckDataHelper.GetHeroCard(new List<FoodTruck> { sampleFoodTruck }, "37.851", "-122.04");
             Assert.IsNotNull(result);
-            Assert.AreEqual(sampleFoodTruck.Address, result.Buttons.First().Title);
+            Assert.AreEqual("Test Value", result.Buttons.First().Title);
             Assert.AreEqual("https://www.google.com/maps/dir/?api=1&origin=37.851%2C-122.04&destination=37.861%2C-122.05", result.Buttons.First().Value);
         }
     }

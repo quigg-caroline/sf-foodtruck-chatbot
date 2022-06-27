@@ -14,6 +14,8 @@ namespace FoodTruckBot.Utilities
 
         public double Longitude { get; set; }
 
+        public string FoodItems { get; set; }
+
         [Ignore]
         public Coordinate Coordinate => new Coordinate(this.Latitude, this.Longitude);
     }
