@@ -1,9 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using FoodTruckBot.Dialogs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.Configuration;
@@ -37,6 +39,12 @@ namespace FoodTruckBot
 
             // Create the User state.
             services.AddSingleton<UserState>();
+
+            // Create the Conversation state.
+            services.AddSingleton<ConversationState>();
+
+            // Create the dialog the bot will run.
+            services.AddSingleton<Dialog,TruckFinderDialog>();
 
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
             services.AddTransient<IBot, Bots.FoodTruckBot>();
