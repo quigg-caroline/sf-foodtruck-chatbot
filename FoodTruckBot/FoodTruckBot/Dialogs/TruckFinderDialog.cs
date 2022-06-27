@@ -26,6 +26,8 @@
             // Add named dialogs to the DialogSet. These names are saved in the dialog state.
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), waterfallSteps));
             AddDialog(new TextPrompt(nameof(TextPrompt)));
+            AddDialog(new NumberPrompt<double>(nameof(LongitudeStepAsync), LongitudeValidatorAsync));
+            AddDialog(new NumberPrompt<double>(nameof(LatitudeStepAsync), LatitudeValidatorAsync));
             AddDialog(new ConfirmPrompt(nameof(ConfirmPrompt)));
 
             // The initial child Dialog to run.
@@ -34,24 +36,46 @@
 
         private static async Task<DialogTurnResult> LatitudeStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Please enter your latitude.") }, cancellationToken);
+            var promptOptions = new PromptOptions
+            {
+                Prompt = MessageFactory.Text("Please enter your latitude."),
+                RetryPrompt = MessageFactory.Text("The value entered must be between -90 and 90."),
+            };
+            return await stepContext.PromptAsync(nameof(LatitudeStepAsync), promptOptions, cancellationToken);
         }
 
         private static async Task<DialogTurnResult> LongitudeStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            stepContext.Values["latitude"] = Convert.ToDouble(stepContext.Result);
+        {           
+            stepContext.Values["latitude"] = stepContext.Result;
+            var promptOptions = new PromptOptions
+            {
+                Prompt = MessageFactory.Text("Please enter your longitude."),
+                RetryPrompt = MessageFactory.Text("The value entered must be between -180 and 180."),
+            };
 
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Please enter your longitude.") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(LongitudeStepAsync), promptOptions, cancellationToken);
         }
 
         private async Task<DialogTurnResult> LocationConfirmAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            stepContext.Values["longitude"] = Convert.ToDouble(stepContext.Result);
+            stepContext.Values["longitude"] = stepContext.Result;
 
             await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Thanks, you entered {stepContext.Values["latitude"]}, {stepContext.Result}."), cancellationToken);
 
             // WaterfallStep always finishes with the end of the Waterfall or with another dialog; here it is a Prompt Dialog.
             return await stepContext.PromptAsync(nameof(ConfirmPrompt), new PromptOptions { Prompt = MessageFactory.Text("Is this the correct location?") }, cancellationToken);
+        }
+
+        private static Task<bool> LatitudeValidatorAsync(PromptValidatorContext<double> promptContext, CancellationToken cancellationToken)
+        {
+            // This condition is our validation rule. You can also change the value at this point.
+            return Task.FromResult(promptContext.Recognized.Succeeded && promptContext.Recognized.Value > -90 && promptContext.Recognized.Value < 90);
+        }
+
+        private static Task<bool> LongitudeValidatorAsync(PromptValidatorContext<double> promptContext, CancellationToken cancellationToken)
+        {
+            // This condition is our validation rule. You can also change the value at this point.
+            return Task.FromResult(promptContext.Recognized.Succeeded && promptContext.Recognized.Value > -180 && promptContext.Recognized.Value < 180);
         }
 
         private async Task<DialogTurnResult> RecommendationStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -63,7 +87,9 @@
                 var foodTruckData = FoodTruckDataHelper.LoadFoodTruckData();
                 var results = FoodTruckDataHelper.FindFiveClosetTrucks(foodTruckData, originLatitude, originLongitude);
 
-                var msg = MessageFactory.Attachment(FoodTruckDataHelper.GetHeroCard(results, stepContext.Values["latitude"].ToString(), stepContext.Values["longitude"].ToString()).ToAttachment());
+                var attachment = FoodTruckDataHelper.GetHeroCard(results, stepContext.Values["latitude"].ToString(), stepContext.Values["longitude"].ToString()).ToAttachment();
+
+                var msg = MessageFactory.Attachment(attachment);
 
                 await stepContext.Context.SendActivityAsync(msg, cancellationToken: cancellationToken);
                 return await stepContext.EndDialogAsync(cancellationToken: cancellationToken);

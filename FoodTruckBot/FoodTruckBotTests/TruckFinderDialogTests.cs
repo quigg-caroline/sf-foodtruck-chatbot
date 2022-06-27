@@ -13,7 +13,7 @@ namespace FoodTruckBotTests
     public class TruckFinderDialogTests
     {
         [TestMethod]
-        public async Task Dialog_Should_Validate()
+        public async Task Dialog_Should_Flow_Expected()
         {
             var dialog = new TruckFinderDialog();
             var testClient = new DialogTestClient(Microsoft.Bot.Connector.Channels.Test, dialog);
@@ -32,6 +32,28 @@ namespace FoodTruckBotTests
 
             reply = await testClient.SendActivityAsync<IMessageActivity>("1");
             Assert.AreEqual($"4650 MISSION ST\n1500 GENEVA AVE\n1500 GENEVA AVE\n4384 MISSION ST\n400 ALEMANY BLVD", reply.Text);
+        }
+
+        [TestMethod]
+        public async Task Dialog_Should_Validate_Input()
+        {
+            var dialog = new TruckFinderDialog();
+            var testClient = new DialogTestClient(Microsoft.Bot.Connector.Channels.Test, dialog);
+
+            var reply = await testClient.SendActivityAsync<IMessageActivity>("hi");
+            Assert.AreEqual("Please enter your latitude.", reply.Text);
+
+            reply = await testClient.SendActivityAsync<IMessageActivity>("100");
+            Assert.AreEqual("The value entered must be between -90 and 90.", reply.Text);
+
+            reply = await testClient.SendActivityAsync<IMessageActivity>("37.7112");
+            Assert.AreEqual("Please enter your longitude.", reply.Text);
+
+            reply = await testClient.SendActivityAsync<IMessageActivity>("250");
+            Assert.AreEqual("The value entered must be between -180 and 180.", reply.Text);
+
+            reply = await testClient.SendActivityAsync<IMessageActivity>("-122.43");
+            Assert.AreEqual("Thanks, you entered 37.7112, -122.43.", reply.Text);
         }
     }
 }
