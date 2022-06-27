@@ -3,16 +3,18 @@
 //
 // Generated with Bot Builder V4 SDK Template for Visual Studio CoreBot v4.15.2
 
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Builder.TraceExtensions;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace FoodTruckBot
 {
     public class AdapterWithErrorHandler : CloudAdapter
     {
-        public AdapterWithErrorHandler(BotFrameworkAuthentication auth, ILogger<IBotFrameworkHttpAdapter> logger)
+        public AdapterWithErrorHandler(BotFrameworkAuthentication auth, ILogger<IBotFrameworkHttpAdapter> logger, ConversationState conversationState)
             : base(auth, logger)
         {
             OnTurnError = async (turnContext, exception) =>
@@ -21,8 +23,22 @@ namespace FoodTruckBot
                 logger.LogError(exception, $"[OnTurnError] unhandled error : {exception.Message}");
 
                 // Send a message to the user
-                await turnContext.SendActivityAsync("The bot encountered an error or bug.");
-                await turnContext.SendActivityAsync("To continue to run this bot, please fix the bot source code.");
+                await turnContext.SendActivityAsync("Something went wrong. Please wait a second and ping the bot again");
+
+                if (conversationState != null)
+                {
+                    try
+                    {
+                        // Delete the conversationState for the current conversation to prevent the
+                        // bot from getting stuck in a error-loop caused by being in a bad state.
+                        await conversationState.DeleteAsync(turnContext);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogError(e, $"Exception caught on attempting to Delete ConversationState : {e.Message}");
+                    }
+                }
+
 
                 // Send a trace activity, which will be displayed in the Bot Framework Emulator
                 await turnContext.TraceActivityAsync("OnTurnError Trace", exception.Message, "https://www.botframework.com/schemas/error", "TurnError");
