@@ -55,7 +55,7 @@
             var cardActions = trucks.Select(x => 
                 new CardAction(
                     ActionTypes.OpenUrl,
-                    x.TruckFoodName,
+                    $"{x.TruckFoodName} - ({x.Address})",
                     value: GetGoogleMapsDirectionUri(x, latitude, longitude))).ToList();
 
             var heroCard = new HeroCard

@@ -25,9 +25,8 @@
 
             // Add named dialogs to the DialogSet. These names are saved in the dialog state.
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), waterfallSteps));
-            AddDialog(new TextPrompt(nameof(TextPrompt)));
-            AddDialog(new NumberPrompt<double>(nameof(LongitudeStepAsync), LongitudeValidatorAsync));
-            AddDialog(new NumberPrompt<double>(nameof(LatitudeStepAsync), LatitudeValidatorAsync));
+            AddDialog(new TextPrompt(nameof(LongitudeStepAsync), LongitudeValidatorAsync));
+            AddDialog(new TextPrompt(nameof(LatitudeStepAsync), LatitudeValidatorAsync));
             AddDialog(new ConfirmPrompt(nameof(ConfirmPrompt)));
 
             // The initial child Dialog to run.
@@ -66,16 +65,20 @@
             return await stepContext.PromptAsync(nameof(ConfirmPrompt), new PromptOptions { Prompt = MessageFactory.Text("Is this the correct location?") }, cancellationToken);
         }
 
-        private static Task<bool> LatitudeValidatorAsync(PromptValidatorContext<double> promptContext, CancellationToken cancellationToken)
+        private static Task<bool> LatitudeValidatorAsync(PromptValidatorContext<string> promptContext, CancellationToken cancellationToken)
         {
             // This condition is our validation rule. You can also change the value at this point.
-            return Task.FromResult(promptContext.Recognized.Succeeded && promptContext.Recognized.Value > -90 && promptContext.Recognized.Value < 90);
+            return Task.FromResult(promptContext.Recognized.Succeeded && 
+                Convert.ToDouble(promptContext.Recognized.Value) > -90 && 
+                Convert.ToDouble(promptContext.Recognized.Value) < 90);
         }
 
-        private static Task<bool> LongitudeValidatorAsync(PromptValidatorContext<double> promptContext, CancellationToken cancellationToken)
+        private static Task<bool> LongitudeValidatorAsync(PromptValidatorContext<string> promptContext, CancellationToken cancellationToken)
         {
             // This condition is our validation rule. You can also change the value at this point.
-            return Task.FromResult(promptContext.Recognized.Succeeded && promptContext.Recognized.Value > -180 && promptContext.Recognized.Value < 180);
+            return Task.FromResult(promptContext.Recognized.Succeeded &&
+                Convert.ToDouble(promptContext.Recognized.Value) > -180 &&
+                Convert.ToDouble(promptContext.Recognized.Value) < 180);
         }
 
         private async Task<DialogTurnResult> RecommendationStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -91,6 +94,9 @@
 
                 var msg = MessageFactory.Attachment(attachment);
 
+                await stepContext.Context.SendActivityAsync(msg, cancellationToken: cancellationToken);
+
+                msg = MessageFactory.Text("If you want to get recommendations again, please send another message");
                 await stepContext.Context.SendActivityAsync(msg, cancellationToken: cancellationToken);
                 return await stepContext.EndDialogAsync(cancellationToken: cancellationToken);
             }
