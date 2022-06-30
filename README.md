@@ -1,11 +1,6 @@
 # SF FoodTruck Bot
 Chat with the food truck bot to find your favorite SF food trucks. This is my first time working with Azure's Bot Framework, so thought it would be a fun way to learn something new.
 
-### Try it out!
-[Add to MS Teams](https://teams.microsoft.com/l/chat/0/0?users=28:7e4930e6-a2be-4280-a21e-668c65482fd1)
-
-[Try in the browser](https://webchat.botframework.com/embed/Food_Truck_Bot-CUS?s=z3TzvEryfz8.89JINP5WciRL3-2tewRL0TKjHkD2qpd17pp1orkEGlg) using WebChat
-
 #### Development Prerequisites & Resources
 - [ASP.NET Core Runtime 3.1](https://dotnet.microsoft.com/en-us/download/dotnet/3.1)
 - [Bot Framework Emulator](https://github.com/microsoft/BotFramework-Emulator/blob/master/README.md)
